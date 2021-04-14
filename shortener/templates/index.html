@@ -1,0 +1,57 @@
+<head>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<main>
+    <h1>URL Shortener</h1>
+    <div class="container-fluid">
+        <form id="post-form">
+            {% csrf_token %}
+            <input class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" required type="url"
+                   name="link" id="link"
+                   placeholder="Enter URL here">
+            <br>
+            <button class="btn btn-primary" type="submit" id="shorten">Shorten</button>
+        </form>
+
+        <section id="section"><h2 id="url"></h2>
+            <button class="btn btn-primary" onclick="copyToClipBoard('#url')">Copy text</button>
+        </section>
+    </div>
+</main>
+<script type="text/javascript">
+    function copyToClipBoard(element) {
+        const $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($(element).text()).select();
+        document.execCommand("copy");
+        $temp.remove();
+        alert("copied to clipboard");
+    }
+
+</script>
+<script type="text/javascript">
+    $(document).on('submit', '#post-form', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: '/create',
+            data: {
+                link: $('#link').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (data) {
+                $('h2').html("localhost:8000/" + data)
+            },
+            error: function () {
+                $('h2').html("Podany URL jest nieprawidłowy")
+            }
+        });
+    });
+
+</script>
