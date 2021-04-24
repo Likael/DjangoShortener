@@ -5,24 +5,47 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <title>URL Shortener</title>
 </head>
 <main>
-    <div class="container-fluid">
-        <h1 class="text-justify">URL Shortener</h1>
+    <header class="masthead  ">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto">
+                    <h1 class="m-4 text-center">Shorten your URL!</h1>
+                </div>
+                <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+                    <form id="post-form">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="col-12 col-md-9 mb-2 mb-md-0">
+                                <input class="form-control form-control-lg" aria-label="Small"
+                                       aria-describedby="inputGroup-sizing-sm" required
+                                       type="url"
+                                       name="link" id="link"
+                                       placeholder="Enter URL here">
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <button class="btn btn-block btn-lg btn-primary" type="submit" id="shorten">Shorten
+                                </button>
+                            </div>
+                        </div>
+                    </form>
 
-        <form id="post-form">
-            {% csrf_token %}
-            <input class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" required type="url"
-                   name="link" id="link"
-                   placeholder="Enter URL here">
-            <br>
-            <button class="btn btn-primary" type="submit" id="shorten">Shorten</button>
-
-            <button class="btn btn-primary" hidden onclick="copyToClipBoard('#url')">Copy text</button>
-        </form>
-        <h2 id="url"></h2>
-    </div>
+                    <div class="m-4 text-center">
+                        <h2 id="url"></h2>
+                        <button class="btn btn-danger" id="copy" style="display:none; margin:0 auto"
+                                onclick="copyToClipBoard('#url')">Copy
+                            URL
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </header>
 </main>
+
 <script type="text/javascript">
     function copyToClipBoard(element) {
         const $temp = $("<input>");
@@ -30,7 +53,8 @@
         $temp.val($(element).text()).select();
         document.execCommand("copy");
         $temp.remove();
-        alert("copied to clipboard");
+        document.getElementById("copy").innerHTML = "Copied to clipboard";
+        document.getElementById("copy").disabled = true;
     }
 
 </script>
@@ -43,8 +67,10 @@
         data.append("link", document.getElementById('link').value)
         data.append("csrfmiddlewaretoken", '{{ csrf_token }}')
         axios.post('/create', data).then(function (response) {
-            console.log(response.data)
-            url.innerHTML = "localhost:8000/" + response.data
+            url.innerHTML ='<hr>' + window.location.href + response.data
+            document.getElementById("copy").innerHTML = "Copy URL";
+            document.getElementById("copy").disabled = false;
+            document.getElementById("copy").style.display = "block";
         }).catch(function (error) {
             console.log(error)
             url.innerHTML = 'Something went wrong'
